@@ -1,6 +1,7 @@
 from Thing.Thing import Thing
 from doomConstants import *
-from Vector.Vec2 import Vec2
+from Vector.Vec2 import Vec
+from doomUtils import get_class
 
 class Monster( Thing ):
 
@@ -15,6 +16,11 @@ class Monster( Thing ):
         self.attackerLastSeen = None
         self.player = None
         self.processingAI = True
+        self.projectileType = None
+        self.projectileSpeed = None
+        self.accumulatedDelay = 0
+        self.initialAttack = False
+        self.attackDelay = 150
 
     def process_ai(self):
         if not self.processingAI:
@@ -47,10 +53,15 @@ class Monster( Thing ):
                 self.attackerLastSeen = pos
 
     def attackMelee(self, thing):
+        if self.accumulatedDelay < self.attackDelay:
+            return
         thing.damage( self.meleeDamage )
 
     def attackRanged(self, thing):
-        thing.damage( self.rangedDamage )
+        if self.accumulatedDelay < self attackDelay:
+            return
+        self.doomMap.addProjectile(get_class(self.projectileType)(self.position, (thing.getPosition() - self.position).normalize() * self.projectileSpeed, self.doomMap))
+        #thing.damage( self.rangedDamage )
 
     def setPlayer(self, player):
         self.player = player
